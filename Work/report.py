@@ -7,6 +7,7 @@ from pprint import pprint
 
 portfolio = []
 prices = {}
+report = []
 gain_loss = 0
 
 
@@ -46,12 +47,42 @@ def read_prices(file_name):
     return read_pr
 
 
+'''
+Returns list of tuples containing rows of report
+'''
+def make_report(port, curr_prices):
+    report_list = []
+    
+    header = ('Name', 'Shares', 'Current Price', 'Change')
+    report_list.append(header)
+    
+    delim = f"{'-'*15}"
+    new_line = (delim, delim, delim, delim)
+    report_list.append(new_line)
+    
+    for holding in port:
+        curr_price = curr_prices[holding['name']]
+        price_change = curr_price - holding['price']
+        
+        row = (holding['name'], holding['shares'], curr_price, price_change)
+        report_list.append(row)
+
+    return report_list
+
+
 portfolio = read_portfolio('Data/portfolio.csv')
 prices = read_prices('Data/prices.csv')
+report = make_report(portfolio, prices)
 
+for index, row in enumerate(report):
+    if index == 0 or index == 1:
+        print(f"{row[0]:>15s} {row[1]:>15s} {row[2]:>15s} {row[3]:>15s}")
+    else:
+        dollar_price = f"${row[2]:0.2f}"
+        print(f"{row[0]:>15s} {row[1]:>15d} {dollar_price:>15s} {row[3]:>15.2f}")
 
 for holding in portfolio:
     price_diff = prices[holding['name']] - holding['price']
     gain_loss += holding['shares'] * price_diff
 
-print('Gain/Loss in portfolio -', gain_loss)
+print('\nGain/Loss in portfolio -', gain_loss)
