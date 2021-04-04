@@ -17,11 +17,12 @@ def portfolio_cost_csv(file_name):
         
         headers = next(rows)
         
-        for row in rows:
+        for rowNo, row in enumerate(rows):
+            record = dict(zip(headers, row))
             try:
-                total_cost += int(row[1]) * float(row[2])
+                total_cost += int(record['shares']) * float(record['price'])
             except ValueError:
-                print('WARNING! Incorrect data at', row)
+                print(f'WARNING! Incorrect data: {row} at row number {rowNo}')
     
     return total_cost
 
@@ -35,24 +36,25 @@ def portfolio_cost(file_name):
     with open(file_name, 'rt') as data_file:
         headers = next(data_file)
         
-        for line in data_file:
-            line_split = line.split(',')
+        for rowNo, row in enumerate(data_file):
+            row_split = row.split(',')
+            record = dict(zip(headers, row_split))
             try:
-                line_split[2] = line_split[2].strip()
+                record['price'] = record['price'].strip()
                 
-                total_cost += int(line_split[1]) * float(line_split[2])
+                total_cost += int(record['shares']) * float(record['price'])
             except ValueError:
-                print('WARNING! Incorrect data at', line)
+                print(f'WARNING! Incorrect data: {row} at row number {rowNo}')
     
     return total_cost
 
 
-is_csv_true = False
+is_csv_true = True
 
 if len(sys.argv) == 3:
     file_name = sys.argv[1]
-    if sys.argv[2] == 'y':
-        is_csv_true = True
+    if sys.argv[2] == 'n':
+        is_csv_true = False
 elif len(sys.argv) == 2:
     file_name = sys.argv[1]
 else:
